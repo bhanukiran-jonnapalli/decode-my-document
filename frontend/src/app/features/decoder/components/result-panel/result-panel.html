@@ -1,0 +1,139 @@
+<div class="result-panel">
+
+  <!-- Summary -->
+  <div class="result-card result-card--summary">
+    <div class="result-card__header">
+      <div class="result-card__label">
+        <span class="result-card__icon result-card__icon--blue" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </span>
+        <h2 class="result-card__title">Summary</h2>
+      </div>
+      <button
+        class="copy-btn"
+        [class.copy-btn--copied]="copiedSection() === 'summary'"
+        (click)="copyText(data().summary, 'summary')"
+        [attr.aria-label]="copiedSection() === 'summary' ? 'Copied!' : 'Copy summary'"
+      >
+        @if (copiedSection() === 'summary') {
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          Copied!
+        } @else {
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        }
+      </button>
+    </div>
+    <p class="result-card__body">{{ data().summary }}</p>
+  </div>
+
+  <!-- Red Flags -->
+  <div class="result-card result-card--flags">
+    <div class="result-card__header">
+      <div class="result-card__label">
+        <span class="result-card__icon result-card__icon--red" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </span>
+        <h2 class="result-card__title">
+          Red Flags
+          <span class="result-card__badge result-card__badge--red">{{ data().redFlags.length }}</span>
+        </h2>
+      </div>
+      <button
+        class="copy-btn"
+        [class.copy-btn--copied]="copiedSection() === 'flags'"
+        (click)="copyList(data().redFlags, 'flags')"
+        [attr.aria-label]="copiedSection() === 'flags' ? 'Copied!' : 'Copy red flags'"
+      >
+        @if (copiedSection() === 'flags') {
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          Copied!
+        } @else {
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        }
+      </button>
+    </div>
+    <ul class="result-card__list">
+      @for (flag of (expandedFlags() ? data().redFlags : data().redFlags.slice(0, MAX_VISIBLE)); track $index) {
+        <li class="result-card__item result-card__item--flag">
+          <span class="result-card__bullet result-card__bullet--flag" aria-hidden="true"></span>
+          <span>{{ flag }}</span>
+        </li>
+      }
+    </ul>
+    @if (data().redFlags.length > MAX_VISIBLE) {
+      <button class="result-card__expand" (click)="expandedFlags.update(v => !v)">
+        {{ expandedFlags() ? 'Show less' : 'Show all ' + data().redFlags.length + ' red flags' }}
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" [style.transform]="expandedFlags() ? 'rotate(180deg)' : 'none'" style="transition: transform 200ms ease"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+    }
+  </div>
+
+  <!-- Questions -->
+  <div class="result-card result-card--questions">
+    <div class="result-card__header">
+      <div class="result-card__label">
+        <span class="result-card__icon result-card__icon--green" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </span>
+        <h2 class="result-card__title">
+          Questions to Ask
+          <span class="result-card__badge result-card__badge--green">{{ data().questions.length }}</span>
+        </h2>
+      </div>
+      <button
+        class="copy-btn"
+        [class.copy-btn--copied]="copiedSection() === 'questions'"
+        (click)="copyList(data().questions, 'questions')"
+        [attr.aria-label]="copiedSection() === 'questions' ? 'Copied!' : 'Copy questions'"
+      >
+        @if (copiedSection() === 'questions') {
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          Copied!
+        } @else {
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        }
+      </button>
+    </div>
+    <ul class="result-card__list">
+      @for (q of (expandedQuestions() ? data().questions : data().questions.slice(0, MAX_VISIBLE)); track $index) {
+        <li class="result-card__item result-card__item--question">
+          <span class="result-card__bullet result-card__bullet--question" aria-hidden="true"></span>
+          <span>{{ q }}</span>
+        </li>
+      }
+    </ul>
+    @if (data().questions.length > MAX_VISIBLE) {
+      <button class="result-card__expand" (click)="expandedQuestions.update(v => !v)">
+        {{ expandedQuestions() ? 'Show less' : 'Show all ' + data().questions.length + ' questions' }}
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" [style.transform]="expandedQuestions() ? 'rotate(180deg)' : 'none'" style="transition: transform 200ms ease"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+    }
+  </div>
+
+  <div class="result-panel__footer">
+    <button class="result-panel__reset" (click)="decodeAnother.emit()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="1 4 1 10 7 10"/>
+        <path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
+      </svg>
+      Decode another document
+    </button>
+  </div>
+
+</div>

@@ -1,0 +1,66 @@
+<main class="home">
+  <div class="container">
+
+    <header class="home__hero">
+      <div class="home__logo" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <circle cx="11" cy="15" r="3"/>
+          <line x1="16" y1="20" x2="13.5" y2="17.5"/>
+        </svg>
+      </div>
+      <h1 class="home__title">Decode My Document</h1>
+      <p class="home__subtitle">
+        Upload any Indian legal document and get an instant plain-English analysis —
+        summary, red flags, and key questions to ask your lawyer.
+      </p>
+    </header>
+
+    @if (!store.hasResult()) {
+      <div class="home__steps" aria-label="Current step">
+        <div class="home__step" [class.home__step--active]="store.isIdle() || store.hasError()">
+          <div class="home__step-num">1</div>
+          <span class="home__step-label">Upload</span>
+        </div>
+        <div class="home__step-line" [class.home__step-line--active]="store.loading()"></div>
+        <div class="home__step" [class.home__step--active]="store.loading()">
+          <div class="home__step-num">2</div>
+          <span class="home__step-label">Analyse</span>
+        </div>
+        <div class="home__step-line"></div>
+        <div class="home__step">
+          <div class="home__step-num">3</div>
+          <span class="home__step-label">Results</span>
+        </div>
+      </div>
+
+      <div class="home__upload-wrap">
+        <app-upload-card (fileSelected)="onFileSelected($event)" />
+      </div>
+    }
+
+    @if (store.hasResult()) {
+      <div #resultsRef class="home__results">
+        <app-result-panel
+          [data]="store.result()!"
+          (decodeAnother)="onDecodeAnother()"
+        />
+      </div>
+    }
+
+  </div>
+</main>
+
+@if (store.loading()) {
+  <app-loader-overlay />
+}
+
+@if (store.hasError()) {
+  <app-error-dialog
+    [message]="store.error()!"
+    (retry)="onRetry()"
+    (changeDocument)="onChangeDocument()"
+    (close)="onCloseError()"
+  />
+}

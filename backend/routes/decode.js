@@ -1,78 +1,106 @@
-const express = require('express')
-const router = express.Router()
-const multer = require('multer')
-const pdfParse = require('pdf-parse')
-const Anthropic = require('@anthropic-ai/sdk')
+const express = require("express");
+const router = express.Router();
+const multer = require("multer");
+const pdfParse = require("pdf-parse");
+const Anthropic = require("@anthropic-ai/sdk");
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const client = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
 
-const storage = multer.memoryStorage()
-const upload = multer({ 
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 } //5mb
-})
+const storage = multer.memoryStorage();
 
-router.post('/', (req, res) => {
-  upload.single('document')(req, res, async (err) => {
-    
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+});
+
+router.post("/", (req, res) => {
+  upload.single("document")(req, res, async (err) => {
     if (err) {
-      return res.status(400).json({ error: err.message })
+      return res.status(400).json({
+        error: "File upload failed",
+        details: err.message,
+      });
     }
 
     try {
       if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded' })
+        return res.status(400).json({
+          error: "No file uploaded",
+        });
       }
 
-      const pdfData = await pdfParse(req.file.buffer)
-      const extractedText = pdfData.text
+      const pdfData = await pdfParse(req.file.buffer);
+      const extractedText = pdfData.text;
 
       if (!extractedText || extractedText.trim().length === 0) {
-        return res.status(400).json({ error: 'Could not extract text from this document' })
+        return res.status(400).json({
+          error: "Could not extract text from this document",
+        });
       }
 
-      res.setHeader('Content-Type', 'text/plain')
-      res.setHeader('Transfer-Encoding', 'chunked')
-
-      const stream = await client.messages.stream({
-        model: 'claude-sonnet-4-20250514',
+      const response = await client.messages.create({
+        model: "claude-sonnet-4-20250514",
         max_tokens: 1500,
-        system: `You are a legal document expert specialising in Indian law. 
-                When given a document, you must respond in exactly this format:
+        system: `
+                  You are a legal document expert specialising in Indian law.
 
-                SUMMARY
-                Write 3-5 sentences explaining what this document is and what it means for the person signing it. Use simple language any Indian adult can understand.
+                  Respond ONLY in valid JSON format like this:
 
-                RED FLAGS
-                List any concerning clauses, unfair terms, or things the person should be worried about. If none, write "No major red flags found."
+                  {
+                    "summary": "3-5 sentence explanation in simple language",
+                    "redFlags": ["point 1", "point 2"],
+                    "questions": ["question 1", "question 2"]
+                  }
 
-                QUESTIONS TO ASK
-                List 3-5 questions the person should ask before signing this document.
+                  Rules:
+                  - No extra text
+                  - No markdown
+                  - No explanation outside JSON
+                  - Keep everything simple. Avoid legal jargon
+                `,
+        messages: [
+          {
+            role: "user",
+            content: `Please analyse this document:\n\n${extractedText}`,
+          },
+        ],
+      });
 
-                Keep everything simple. Avoid legal jargon.`,
-        messages: [{ 
-          role: 'user', 
-          content: `Please analyse this document:\n\n${extractedText}` 
-        }]
-      })
+      const aiText = response.content?.[0]?.text;
 
-      for await (const chunk of stream) {
-        if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
-          res.write(chunk.delta.text)
-        }
+      if (!aiText) {
+        return res.status(500).json({
+          error: "Empty response from AI",
+        });
       }
 
-      res.end()
+      let parsedData;
 
+      try {
+        parsedData = JSON.parse(aiText);
+      } catch (parseError) {
+        console.error("JSON Parse Error:", parseError.message);
+
+        return res.status(500).json({
+          error: "AI response format invalid",
+          rawResponse: aiText,
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: parsedData,
+      });
     } catch (error) {
-      console.error('Error:', error.message)
-      if (!res.headersSent) {
-        res.status(500).json({ error: 'Something went wrong. Please try again.' })
-      } else {
-        res.end()
-      }
-    }
-  })
-})
+      console.error("Server Error:", error.message);
 
-module.exports = router
+      return res.status(500).json({
+        error: "Something went wrong. Please try again.",
+      });
+    }
+  });
+});
+
+module.exports = router;

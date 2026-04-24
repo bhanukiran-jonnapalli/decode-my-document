@@ -20,41 +20,46 @@ Built for everyday Indian users who receive complex legal documents and don't kn
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Angular 17 |
-| Backend | Node.js, Express |
-| AI | Anthropic Claude (Sonnet) |
-| File handling | Multer, pdf-parse |
-| Deployment | Vercel (frontend), Railway (backend) |
+| Layer         | Technology                           |
+| ------------- | ------------------------------------ |
+| Frontend      | Angular 17                           |
+| Backend       | Node.js, Express                     |
+| AI            | Anthropic Claude (Sonnet)            |
+| File handling | Multer, pdf-parse                    |
+| Deployment    | Vercel (frontend), Railway (backend) |
 
 ---
 
 ## Local Setup
 
 ### Prerequisites
+
 - Node.js 18+
 - Anthropic API key — get one at [console.anthropic.com](https://console.anthropic.com)
 
 ### 1. Clone the repo
+
 ```bash
 git clone https://github.com/yourusername/decode-my-document.git
 cd decode-my-document
 ```
 
 ### 2. Backend
+
 ```bash
 cd backend
 npm install
 ```
 
 Create a `.env` file inside the `backend` folder:
+
 ```
 ANTHROPIC_API_KEY=your_key_here
 PORT=3000
 ```
 
 Start the server:
+
 ```bash
 node index.js
 ```
@@ -62,6 +67,7 @@ node index.js
 Server runs at `http://localhost:3000`
 
 ### 3. Frontend
+
 ```bash
 cd frontend
 npm install
@@ -79,12 +85,14 @@ App runs at `http://localhost:4200`
 Accepts a PDF and returns a streaming AI analysis.
 
 **Request**
+
 ```
 Content-Type: multipart/form-data
 Body: document (file) — PDF only, max 5MB
 ```
 
 **Response**
+
 ```
 Streaming plain text in this format:
 
@@ -99,6 +107,7 @@ Smart questions to ask before signing.
 ```
 
 **Test with curl**
+
 ```bash
 curl -X POST http://localhost:3000/api/decode \
   -F "document=@/path/to/your/file.pdf"
@@ -122,18 +131,6 @@ decode-my-document/
 │       └── app/            # Angular components
 └── README.md
 ```
-
----
-
-## Roadmap
-
-- [x] PDF upload and text extraction
-- [x] Claude AI streaming integration
-- [x] Structured output — Summary, Red Flags, Questions
-- [ ] Scanned document support (OCR)
-- [ ] Document history
-- [ ] Razorpay payment integration
-- [ ] Mobile responsive UI
 
 ---
 

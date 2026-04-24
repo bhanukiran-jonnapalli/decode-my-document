@@ -1,0 +1,33 @@
+.theme-toggle {
+  position: fixed;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-body);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition:
+    background-color var(--transition-base),
+    border-color var(--transition-base),
+    color var(--transition-base),
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+
+  &:hover {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+    transform: scale(1.08);
+  }
+
+  &:active {
+    transform: scale(0.93);
+  }
+}
