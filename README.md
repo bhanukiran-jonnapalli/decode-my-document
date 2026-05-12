@@ -40,7 +40,7 @@ Built for everyday Indian users who receive complex legal documents and don't kn
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/yourusername/decode-my-document.git
+git clone https://github.com/bhanukiran-jonnapalli/decode-my-document.git
 cd decode-my-document
 ```
 
