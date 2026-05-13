@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DecodeData, DecodeResponse } from '../models/decoder.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DecoderStore {
@@ -25,7 +26,7 @@ export class DecoderStore {
     formData.append('document', file);
 
     this.http
-      .post<DecodeResponse>('http://localhost:3000/api/decode', formData)
+      .post<DecodeResponse>(`${environment.apiUrl}/api/decode`, formData)
       .subscribe({
         next: (res) => {
           this.result.set(res.data);

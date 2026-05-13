@@ -7,7 +7,11 @@ const app = express(); // think of express() is turning engine on app is object 
 
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({ origin: "http://localhost:4200" }));
+const allowedOrigins = process.env.ALLOWED_ORIGIN
+  ? process.env.ALLOWED_ORIGIN.split(',')
+  : ['http://localhost:4200'];
+
+app.use(cors({ origin: allowedOrigins }));
 
 app.use(express.json());
 
