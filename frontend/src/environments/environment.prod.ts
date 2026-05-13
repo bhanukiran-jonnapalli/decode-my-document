@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'REPLACE_WITH_RENDER_URL',
+  apiUrl: 'https://decode-my-document.onrender.com',
 };
